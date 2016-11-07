@@ -53,7 +53,68 @@ extension ImageViewController {
         print("Image is already filtered")
     }
     
+    func filterImage(with completion: @escaping ((Bool) -> Void)) {
+        
+        let queue = OperationQueue()
+        queue.name = "Image Filtration Queue"
+        queue.qualityOfService = .userInitiated
+        queue.maxConcurrentOperationCount = 1
+        
+        for filter in filtersToApply {
+            
+            let filtered = FilterOperation(flatigram: flatigram, filter: filter)
+            
+            filtered.completionBlock = {
+                
+                if filtered.isCancelled {
+                    completion(false)
+                    return
+                }
+
+                
+                if queue.operationCount == 0 {
+                    DispatchQueue.main.async(execute: {
+                        self.flatigram.state = .filtered
+                        completion(true)
+                    })
+                }
+                    
+            }
+            
+            queue.addOperation(filtered)
+            print("Added FilterOperation with \(filter) to \(queue.name!)")
+            
+        
+        }
+        //            imageView.image = flatigram.image?.filter(with: filter)
+    }
+    
+    func startProcess() {
+        
+        activityIndicator.startAnimating()
+        filterButton.isEnabled = false
+        chooseImageButton.isEnabled = false
+        
+        filterImage { (success) in
+            
+            OperationQueue.main.addOperation {
+                
+                self.imageView.image = self.flatigram.image
+                self.activityIndicator.stopAnimating()
+                self.filterButton.isEnabled = true
+                self.chooseImageButton.isEnabled = true
+                
+        
+            
+                success ? print("Image successfully filtered") : print("Image filtering did not complete")
+            }
+        }
+    }
 }
+
+
+
+
 
 
 // MARK: Scroll View Delegate

@@ -22,8 +22,9 @@ class ImageViewController : UIViewController {
     let filtersToApply = ["CIBloom",
                           "CIPhotoEffectProcess",
                           "CIExposureAdjust"]
+    var flatigram = Flatigram()
     
-//    var flatigram = Flatigram()
+    //    var flatigram = Flatigram()
     
     @IBOutlet weak var filterButton: UIBarButtonItem!
     @IBOutlet weak var chooseImageButton: UIBarButtonItem!
@@ -40,6 +41,23 @@ class ImageViewController : UIViewController {
     
     @IBAction func filterButtonTapped(_ sender: AnyObject) {
         
+        if self.flatigram.state == .filtered {
+            
+            self.presentFilteredAlert()
+            
+        } else {
+            
+            self.startProcess()
+            
+        }
+        
     }
     
+    
+    
 }
+
+
+
+
+
